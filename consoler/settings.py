@@ -2,8 +2,9 @@
 
 class Settings:
     DEBUG = True
+    USE_LOGURU = True  # Not used yet
     CONSOLE_LOG_LEVEL = 'LOG'
-    USE_LOGURU = True
+    CONSOLE_PATH_PREFIX = ''
 
 
 local_settings = Settings()

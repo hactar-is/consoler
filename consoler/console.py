@@ -41,6 +41,7 @@ class Logger(object):
         self.terminal = sys.stdout
         self.writing_progress = False
         self.spindex = 0
+        self.path_prefix = settings.CONSOLE_PATH_PREFIX
 
     def buffer(self, msg):
         """direct print to stdout. This is useful for monitoring progress on cli commands
@@ -76,7 +77,11 @@ class Logger(object):
         frame = inspect.getouterframes(curframe, 0)
         base = os.getcwd()
         try:
-            pos = '{}:{}'.format(frame[1].filename.replace(base, ''), frame[1].lineno)
+            pos = '{}{}:{}'.format(
+                self.path_prefix,
+                frame[1].filename.replace(base, ''),
+                frame[1].lineno
+            )
         except IndexError:  # We couldn't get the stack info for some reason
             return '¯\\_(ツ)_/¯'
         else:
