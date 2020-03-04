@@ -12,16 +12,17 @@ import os
 import sys
 import math
 import inspect
-from typing import Optional, Any
+from typing import Any
 
 import arrow
-from django.conf import settings
 from loguru import logger as guru
 
+from .settings import settings
 from .colours import blue, cyan, green, magenta, orange, red, bg_blue  # NOQA
 
 
 LOG_LEVELS = {
+    'LOG': 0,
     'INFO': 1,
     'SUCCESS': 2,
     'TEMPLATE': 3,
@@ -77,7 +78,7 @@ class Logger(object):
         try:
             pos = '{}:{}'.format(frame[1].filename.replace(base, ''), frame[1].lineno)
         except IndexError:  # We couldn't get the stack info for some reason
-            return '¯\_(ツ)_/¯'
+            return '¯\\_(ツ)_/¯'
         else:
             return pos
 
@@ -87,7 +88,15 @@ class Logger(object):
     def _ts(self) -> str:
         return magenta(str(arrow.now().format('H:mm:ss')))
 
-    def info(self, msg: str, extra=None) -> bool:
+    def log(self, msg=None, extra=None) -> None:
+        if not self._check_log_level('LOG'):
+            return None
+        curframe = inspect.currentframe()
+        pos = self._get_code_position(curframe)
+        prefix = '{} - {} - {}'.format(self._ts(), cyan('LOG'), pos)
+        self._output(prefix, msg, extra)
+
+    def info(self, msg: str, extra=None) -> None:
         """Output a message in the INFO style
 
         Args:
@@ -95,7 +104,7 @@ class Logger(object):
             extra (None, optional): Anything else you want added to the message
         """
         if not self._check_log_level('INFO'):
-            return False
+            return None
         curframe = inspect.currentframe()
         pos = self._get_code_position(curframe)
         prefix = '{} - {} - {}'.format(self._ts(), blue('INFO'), pos)
@@ -103,9 +112,8 @@ class Logger(object):
             self._output(prefix, msg, extra)
         else:
             guru.info(f'{prefix} - {msg} - {extra}')
-        return True
 
-    def warn(self, msg: str, extra=None) -> bool:
+    def warn(self, msg: str, extra=None) -> None:
         """Output a message in the WARN style
 
         Args:
@@ -113,7 +121,7 @@ class Logger(object):
             extra (None, optional): Anything else you want added to the message
         """
         if not self._check_log_level('WARN'):
-            return False
+            return None
         curframe = inspect.currentframe()
         pos = self._get_code_position(curframe)
         prefix = '{} - {} - {}'.format(self._ts(), orange('WARN'), pos)
@@ -122,9 +130,8 @@ class Logger(object):
             self._output(prefix, msg, extra)
         else:
             guru.warning(f'{prefix} - {msg} - {extra}')
-        return True
 
-    def error(self, msg: str, extra=None) -> bool:
+    def error(self, msg: str, extra=None) -> None:
         """Output a message in the ERROR style
 
         Args:
@@ -132,7 +139,7 @@ class Logger(object):
             extra (None, optional): Anything else you want added to the message
         """
         if not self._check_log_level('ERROR'):
-            return False
+            return None
         curframe = inspect.currentframe()
         pos = self._get_code_position(curframe)
         prefix = '{} - {} - {}'.format(self._ts(), red('ERROR'), pos)
@@ -140,9 +147,8 @@ class Logger(object):
             self._output(prefix, msg, extra)
         else:
             guru.error(f'{prefix} - {msg} - {extra}')
-        return True
 
-    def success(self, msg: str, extra=None) -> bool:
+    def success(self, msg: str, extra=None) -> None:
         """Output a message in the SUCCESS style
 
         Args:
@@ -150,7 +156,7 @@ class Logger(object):
             extra (None, optional): Anything else you want added to the message
         """
         if not self._check_log_level('SUCCESS'):
-            return False
+            return None
         curframe = inspect.currentframe()
         pos = self._get_code_position(curframe)
         prefix = '{} - {} - {}'.format(self._ts(), green('SUCCESS'), pos)
@@ -159,7 +165,7 @@ class Logger(object):
         else:
             guru.success(f'{prefix} - {msg} - {extra}')
 
-    def template(self, msg: str, extra=None) -> bool:
+    def template(self, msg: str, extra=None) -> None:
         """Output a message in the TEMPLATE style
 
         Args:
@@ -167,7 +173,7 @@ class Logger(object):
             extra (None, optional): Anything else you want added to the message
         """
         if not self._check_log_level('TEMPLATE'):
-            return False
+            return None
         curframe = inspect.currentframe()
         pos = self._get_code_position(curframe)
         prefix = '{} - {} - {}'.format(self._ts(), magenta('TEMPLATE'), pos)
@@ -175,7 +181,6 @@ class Logger(object):
             self._output(prefix, msg, extra)
         else:
             guru.success(f'{prefix} - {msg} - {extra}')
-        return True
 
     def progress(self, msg: str = '', perc=0):
         spinner_frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
