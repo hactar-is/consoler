@@ -29,7 +29,7 @@ FG = {
     'YELLOW': '\033[93m',
     'LIGHTBLUE': '\033[94m',
     'PINK': '\033[95m',
-    'LIGHTCYAN': '\033[96m'
+    'LIGHTCYAN': '\033[96m',
 }
 
 

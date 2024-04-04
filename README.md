@@ -41,3 +41,10 @@ You can set a log level for which message you want to reach the screen. Availabl
     CONSOLE_PATH_PREFIX = ''
 
 When developing in a docker container or VM, the start of consoler's file paths might not quite match your local filesystem. Set a prefix here to prepend to the output's path string. This is super useful if you use https://github.com/dandavison/iterm2-dwim to make file paths clickable in iTerm.
+
+
+### Changelog
+
+#### 0.1.5
+* Remove the hard dependency on loguru, it still works with it, but this way we don't need to keep this package up to date with loguru releases.
+* Slightly modernise the code a little.
