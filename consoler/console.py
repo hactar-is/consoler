@@ -78,7 +78,7 @@ class Logger(object):
 
     def _get_code_position(self, curframe):
         frame = inspect.getouterframes(curframe, 0)
-        base = Path.cwd()
+        base = str(Path.cwd())
         try:
             pos = '{}{}:{}'.format(
                 self.path_prefix,
@@ -234,8 +234,7 @@ def decode(val):
         except Exception:
             try:
                 return val.decode('ascii')
-            except Exception:
-                if USE_GURU and settings.DEBUG is False:
-                    guru.error(f'Failed to decode {val}')
+            except Exception:  # noqa: S110
+                pass
 
     return val
